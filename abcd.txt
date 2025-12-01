@@ -1,0 +1,169 @@
+Minikube start
+
+kubectl create deployment mynginx --image=nginx
+
+Kubectl get deployments
+
+Kubectl expose deployment mynginx --type = NodePort
+
+--port=80 --target-port=80
+
+kubectl scale deployment myngix --replicas=4
+
+kubectl get deployments
+
+kubectl get pods
+
+kubectl port-forward svc/mynginx 8081:80
+
+
+new
+minikube dashboard
+
+
+
+to clean up
+
+kübeckl detele deployment mynginx
+
+kubectl delete service myngix
+
+minikube stop
+
+
+
+docker username:phaniharika1
+docker info
+docker pull jasonrivers/nagios:latest
+docker run -d --name nagios -p 9090:80 jasonrivers/nagios:latest
+Default login:
+
+User: nagiosadmin
+
+Password: nagios
+
+
+
+
+
+
+
+
+
+pipeline {
+
+agent any
+
+tools{
+
+maven 'MAVEN HOME
+
+stages {
+
+stage('git repo & clean') {
+
+steps {
+
+//bat "rmdir /s /q SampleMaven JavaProject"
+
+bat "git clone https://github.com/budarajumadhurika/SampleMavenJavaPro
+
+bat "mvn clean -f SampleMaven JavaProject"
+
+stage('install') { }
+
+}
+
+steps {
+
+bat "mvn install -f SampleMavenJavaProject"
+
+}
+
+}
+
+stage('test') {
+
+steps {
+
+bat "mvn test -f SampleMavenJavaProject"
+
+}
+
+} stage('package') {
+
+steps {
+
+bat "myn package -f SampleMaven JavaProject"
+
+}
+
+}
+
+
+
+
+
+
+
+
+
+first open docker desktop:
+
+docker version
+docker ps
+docker pull redis
+docker run --name my-redis -d redis
+docker images
+docker ps
+docker ps -a
+docker exec -it my-redis redis-cli
+SET name "KMIT"
+get name
+exit
+docker stop my-redis
+docker ps -a
+docker start my-redis
+docker ps -a
+docker rm my-redis(error so below)
+docker stop my-redis
+docker rm my-redis
+docker ps -a
+docker rmi redis
+
+2.Working with Docker file
+A Docker file is a text file with instructions to create a custom Docker image.
+Step 1: Set Up Your Folder
+1. Windows:
+o Create a folder like C:\DockerProjects\Redis.
+Step 2: Write the Dockerfile
+1. Inside the folder, create a file named Dockerfile (no extension).
+2. Add the following content:
+FROM redis:latest
+CMD ["redis-server"]
+
+C:\Users\G Phaniharika>cd "C:\DockerProjects\Redis"
+C:\DockerProjects\Redis>docker build -t redisnew .
+docker run --name myredisnew -d redisnew
+docker ps
+docker stop myredisnew
+ docker login
+docker ps -a
+docker commit fdf298aea9c5 phaniharika1/redis1
+docker images
+docker push phaniharika1/redis1
+docker rm fdf298aea9c5
+docker rmi phaniharika1/redis1
+docker ps -a
+docker logout
+docker pull phaniharika1/redis1
+docker run --name myredis -d budarajumadhurika/redis1
+docker exec -it myredis redis-cli
+ SET name "Abcdef"
+get name
+exit
+docker ps -a
+docker stop myredis
+docker rm 0e95e5d8762e
+docker images
+docker rmi phaniharika1/redis1
