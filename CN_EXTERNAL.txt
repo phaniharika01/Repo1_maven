@@ -1,0 +1,623 @@
+CHARACTER AND BIT STUFFING:
+
+#include <stdio.h>
+#include <string.h>
+
+// Character Stuffing
+void charStuffing(char data[]) {
+    printf("Character Stuffed Output: $");
+    for (int i = 0; data[i] != '\0'; i++) {
+        if (data[i] == '$' || data[i] == '#') {
+            printf("#");
+        }
+        printf("%c", data[i]);
+    }
+    printf("$\n");
+}
+
+// Bit Stuffing
+void bitStuffing(char data[]) {
+    printf("Bit Stuffed Output: 01111110");
+    int count = 0;
+    for (int i = 0; data[i] != '\0'; i++) {
+        printf("%c", data[i]);
+        if (data[i] == '1') {
+            count++;
+            if (count == 5) {
+                printf("0");
+                count = 0;
+            }
+        } else {
+            count = 0;
+        }
+    }
+    printf("01111110\n");
+}
+
+int main() {
+    int choice;
+    char data[200];
+
+    printf("Choose Framing Method:\n");
+    printf("1. Character Stuffing\n");
+    printf("2. Bit Stuffing\n");
+    printf("Enter your choice:\n");
+    scanf("%d", &choice);
+
+    if (choice == 1) {
+        printf("Enter the data string (no spaces):\n");
+        scanf("%s", data);   // <-- Modified as you asked
+        charStuffing(data);
+    }
+    else if (choice == 2) {
+        printf("Enter the data bits (0's and 1's):\n");
+        scanf("%s", data);
+        bitStuffing(data);
+    }
+    else {
+        printf("Invalid choice!\n");
+    }
+
+    return 0;
+}
+
+
+
+GO-BACK N:
+
+#include <stdio.h>
+
+int main() {
+    int total_packets, window_size, loss_every_n;
+    int total_transmissions = 0;
+
+    printf("Enter total number of packets: ");
+    scanf("%d", &total_packets);
+
+    printf("Enter window size: ");
+    scanf("%d", &window_size);
+
+    printf("Enter loss every (n-th packet lost): ");
+    scanf("%d", &loss_every_n);
+S
+    printf("\nSliding Window with Go-Back-N Simulation\n");
+    printf("-----------------------------------------\n");
+
+    int packet = 1; // first unacknowledged packet
+
+    while (packet <= total_packets) {
+        int last_in_window = packet + window_size - 1;
+        if (last_in_window > total_packets) last_in_window = total_packets;
+
+        int success_till = packet - 1; // last successfully acked packet
+
+        // Try sending all packets in window
+        for (int i = packet; i <= last_in_window; i++) {
+            total_transmissions++;
+
+            if (total_transmissions % loss_every_n == 0) {
+                printf("Packet %d lost! -> Go back to resend from this packet\n", i);
+                break; // Go back to this lost packet
+            } else {
+                printf("Packet %d sent successfully.\n", i);
+                success_till = i; // ack received for this packet
+            }
+        }
+
+        // Slide window up to the last acknowledged packet
+        packet = success_till + 1;
+    }
+
+    printf("\nTotal packets transmitted: %d\n", total_transmissions);
+
+    return 0;
+}
+
+
+
+CRC:
+
+
+#include<stdio.h>  
+#include<string.h>  
+  
+#define N strlen(gen_poly)  
+ 
+char data[28];  
+char check_value[28];  
+ 
+char gen_poly[10];  
+
+int data_length,i,j;  
+  
+void XOR(){  
+    
+    for(j = 1;j < N; j++)  
+    check_value[j] = (( check_value[j] == gen_poly[j])?'0':'1');  
+      
+}  
+void crc(){  
+    
+    for(i=0;i<N;i++)  
+        check_value[i]=data[i];  
+    do{  
+    // check if the first bit is 1 and calls XOR function  
+        if(check_value[0]=='1')  
+            XOR();  
+        for(j=0;j<N-1;j++)  
+            check_value[j]=check_value[j+1];  
+          
+        check_value[j]=data[i++];  
+    }while(i<=data_length+N-1);  
+}  
+// Function to check for errors on the receiver side  
+void receiver(){  
+    printf("Enter the received data: ");  
+    scanf("%s", data);  
+    printf("\n-----------------------------\n");  
+    printf("Data received: %s", data);  
+    crc();  
+ 
+    for(i=0;(i<N-1) && (check_value[i]!='1');i++);  
+        if(i<N-1)  
+            printf("\nError detected\n\n");  
+        else  
+            printf("\nNo error detected\n\n");  
+}  
+  
+
+  
+int main()  
+{  
+    
+    printf("\nEnter data to be transmitted: ");  
+    scanf("%s",data);  
+    printf("\n Enter the Generating polynomial: ");  
+    scanf("%s",gen_poly);  
+    data_length=strlen(data);  
+    
+    for(i=data_length;i<data_length+N-1;i++)  
+        data[i]='0';  
+    printf("\n----------------------------------------");  
+  
+    printf("\n Data padded with n-1 zeros : %s",data);  
+    printf("\n----------------------------------------");  
+ 
+    crc();  
+    printf("\nCRC or Check value is : %s",check_value);  
+
+    for(i=data_length;i<data_length+N-1;i++)  
+        data[i]=check_value[i-data_length];  
+    printf("\n----------------------------------------");  
+    printf("\n Final data to be sent : %s",data);  
+    printf("\n----------------------------------------\n");   
+    receiver();  
+        return 0;  
+}  
+/*OUTPUT:
+ 
+Sample output:
+Message D = 1010001101 (10 bits)
+    Predetermined P = 110101 (6 bits)
+    FCS R = to be calculated 5 bits
+   Hence, n = 15 K = 10 and (n k) = 5
+The message is generated through 25:accommodating 1010001101000
+Test cases:
+case = 1
+input = 110100111101100 
+1011 
+110100111111
+output=
+Enter data to be transmitted:                                   
+
+ Enter the Generating polynomial:                                          
+  
+----------------------------------------                                        
+ Data padded with n-1 zeros : 110100111101100000                                
+----------------------------------------                                        
+CRC or Check value is : 111                                                     
+----------------------------------------                                        
+ Final data to be sent : 110100111101100111                                     
+----------------------------------------                                        
+Enter the received data:                                            
+  -----------------------------                                                   
+Data received: 110100111111                                                     
+Error detected  */   
+
+
+
+
+
+LEAKY BUCKET ALGORITHM:
+
+#include <stdio.h>
+
+int main() {
+    int bucket_size, output_rate, input_packets, stored = 0, time;
+
+    printf("Enter bucket size: ");
+    scanf("%d", &bucket_size);
+
+    printf("Enter output rate (leak rate): ");
+    scanf("%d", &output_rate);
+
+    printf("Enter number of cycles (time units): ");
+    scanf("%d", &time);
+
+    while (time--) {
+        printf("\nEnter number of packets arriving: ");
+        scanf("%d", &input_packets);
+
+        // Check for overflow condition
+        if (stored + input_packets > bucket_size) {
+            printf("Bucket overflow! %d packets dropped.\n", (stored + input_packets) - bucket_size);
+            stored = bucket_size;
+        } else {
+            stored += input_packets;
+        }
+
+        printf("Packets currently in bucket: %d\n", stored);
+
+        // Leak / Send packets
+        if (stored >= output_rate) {
+            stored -= output_rate;
+            printf("Packets sent: %d\n", output_rate);
+        } else {
+            printf("Packets sent: %d\n", stored);
+            stored = 0;
+        }
+
+        printf("Packets left in bucket after sending: %d\n", stored);
+    }
+
+    return 0;
+}
+
+
+
+PING:
+
+import java.net.*;
+import java.io.*;
+public class Main {
+    public static void main(String[] args) {
+        String hostname = args[0];
+        try {
+            System.out.println("Pinging " + hostname + "...");
+            InetAddress inetAddress = InetAddress.getByName(hostname);
+            boolean isReachable = inetAddress.isReachable(5000);
+            if (isReachable) {
+                System.out.println("Host " + hostname + " is reachable.");
+                System.out.println("IP Address: " + inetAddress.getHostAddress());
+            } else {
+                System.out.println("Host " + hostname + " is not reachable.");
+            }
+        } catch (Exception e) {
+            System.out.println("Unknown host: " + hostname);
+        }
+    }
+}
+
+
+
+DNS:
+
+import java.net.*;
+import java.util.Scanner;
+
+public class b {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the Simple DNS Resolver!");
+        System.out.println("Enter a domain name to resolve (or type 'exit' to quit):");
+
+        while (true) {
+            System.out.print("Domain: ");
+            String domain = scanner.nextLine();
+
+            if ("exit".equalsIgnoreCase(domain)) {
+                System.out.println("Exiting DNS Resolver. Goodbye!");
+                break;
+            }
+
+            try {
+                InetAddress[] addresses = InetAddress.getAllByName(domain);
+                System.out.println("IP addresses for " + domain + ":");
+
+                for (InetAddress address : addresses) {
+                    System.out.println(" - " + address.getHostAddress());
+                }
+            } catch (UnknownHostException e) {
+                System.out.println("Could not resolve domain: " + e.getMessage());
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+
+
+AND127 & XOR127
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc=new Scanner(System.in);
+        String s=sc.nextLine();
+
+        System.out.println("Char\tASCII\tAND127\tXOR127");
+        for(char c : s.toCharArray())
+            System.out.println(c+"\t"+(int)c+"\t"+(c&127)+"\t"+(c^127));
+    }
+}
+
+
+
+XOR0 :
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc=new Scanner(System.in);
+        String s=sc.nextLine();
+
+        System.out.println("Char\tXOR0");
+        for(char c : s.toCharArray())
+            System.out.println(c+"\t"+(c^0));
+}
+}
+
+
+DISTANCE VECTOR ROUTING:
+
+#include <stdio.h>
+#define INF 9999
+#define MAX 10
+struct node {
+    int dist[MAX];
+    int nextHop[MAX];
+} rt[MAX];
+int main() {
+    int cost[MAX][MAX];
+    int n;
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+    printf("Enter the cost matrix (use 9999 for INF):\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+            rt[i].dist[j] = cost[i][j];
+            if (cost[i][j] != 9999 && i != j)
+                rt[i].nextHop[j] = j;
+            else
+                rt[i].nextHop[j] = -1;
+        }
+    int updated;
+    do {
+        updated = 0;
+        for (int i = 0; i < n; i++) { 
+            for (int j = 0; j < n; j++) { 
+                for (int k = 0; k < n; k++) { 
+                    if (rt[i].dist[j] > cost[i][k] + rt[k].dist[j]) {
+                        rt[i].dist[j] = cost[i][k] + rt[k].dist[j];
+                        rt[i].nextHop[j] = k;
+                        updated = 1;
+                    }
+                }
+            }
+        }
+    } while (updated);
+    for (int i = 0; i < n; i++) {
+        printf("\nRouting table for node %d:\n", i);
+        printf("Destination\tNext Hop\tDistance\n");
+        for (int j = 0; j < n; j++)
+            printf("%d\t\t%d\t\t%d\n", j, rt[i].nextHop[j], rt[i].dist[j]);
+    }
+    return 0;
+}
+
+
+
+DIJKSTRAS ALGORITHM:
+
+#include <stdio.h>
+#include <limits.h>
+#include <stdbool.h>
+#define V 7  
+int minDistance(int dist[], bool sptSet[]) {
+    int min = INT_MAX, min_index = -1;
+    for (int v = 0; v < V; v++)
+        if (!sptSet[v] && dist[v] <= min)
+            min = dist[v], min_index = v;
+    return min_index;
+}
+void dijkstra(int graph[V][V], int src) {
+    int dist[V];
+    bool sptSet[V];
+    for (int i = 0; i < V; i++)
+        dist[i] = INT_MAX, sptSet[i] = false;
+    dist[src] = 0;
+    for (int count = 0; count < V - 1; count++) {
+        int u = minDistance(dist, sptSet);
+        sptSet[u] = true;
+        for (int v = 0; v < V; v++)
+            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
+                && dist[u] + graph[u][v] < dist[v])
+                dist[v] = dist[u] + graph[u][v];
+    }
+    for (int i = 1; i < V; i++)
+        printf("Distance from source to %d: %d\n", i, dist[i]);
+}
+int main() {
+    int source = 0;
+
+    // printf("Graph (7 nodes, source: 0):\n");
+    // for (int i = 0; i < V; i++) {
+    //     for (int j = 0; j < V; j++) {
+    //         char ch;
+    //         while (scanf("%c", &ch) == 1 && (ch < '0' || ch > '9')) {}
+    //         ungetc(ch, stdin);
+    //         scanf("%d", &graph[i][j]);
+    //     }
+    // }
+int graph[V][V]={{0, 0, 1, 2, 0, 0, 0},
+{0, 0, 2, 0, 0, 3, 0},
+{1, 2, 0, 1, 3, 0, 0},
+{2, 0, 1, 0, 0, 0, 1},
+{0, 0, 3, 0, 0, 2, 0},
+{0, 3, 0, 0, 2, 0, 1},
+{0, 0, 0, 1, 0, 1, 0}};
+    dijkstra(graph, source);
+    return 0;
+}
+
+
+
+
+Take an example SUBNET OF HOSTS and obtain a broadcast tree for the subnet IN C :
+
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+// Function to convert an IP address to a 32-bit integer 
+unsigned int ipToInt(char* ip) { 
+unsigned int a, b, c, d; 
+sscanf(ip, "%u.%u.%u.%u", &a, &b, &c, &d); 
+return (a << 24) | (b << 16) | (c << 8) | d; 
+} 
+// Function to convert a 32-bit integer to an IP address 
+void intToIp(unsigned int ip, char* buffer) { 
+sprintf(buffer, "%u.%u.%u.%u", (ip >> 24) & 0xFF, (ip >> 16) & 0xFF, (ip 
+>> 8) & 0xFF, ip & 0xFF); 
+} 
+// Function to calculate the subnet mask from a prefix length 
+unsigned int calculateSubnetMask(int prefixLength) { 
+return prefixLength == 0 ? 0 : ~((1 << (32 - prefixLength)) - 1); 
+} 
+int main() { 
+char ip[16]; 
+int prefixLength, newPrefixLength; 
+unsigned int subnetMask, newSubnetMask, ipInt; 
+char buffer[16]; 
+// Input IP address and prefix length 
+printf("Enter IP address (e.g., 192.168.1.0): "); 
+scanf("%s", ip); 
+printf("Enter current prefix length (e.g., 24): "); 
+scanf("%d", &prefixLength); 
+// New prefix length for creating two subnets 
+newPrefixLength = prefixLength + 1; 
+// Convert IP address to integer 
+ipInt = ipToInt(ip); 
+// Calculate original subnet mask and new subnet mask 
+subnetMask = calculateSubnetMask(prefixLength); 
+newSubnetMask = calculateSubnetMask(newPrefixLength); 
+// Calculate the number of hosts per subnet 
+int hostsPerSubnet = (1 << (32 - newPrefixLength)) - 2; // subtract 2 for 
+network and broadcast addresses 
+printf("\nNumber of subnets: 2\n"); 
+printf("Number of hosts per subnet: %d\n", hostsPerSubnet); 
+// Generate subnets 
+for (int i = 0; i < 2; i++) { 
+unsigned int subnetNetwork = (ipInt & subnetMask) | (i << (32 - 
+newPrefixLength)); 
+unsigned int subnetBroadcast = subnetNetwork | ~newSubnetMask; 
+unsigned int firstHost = subnetNetwork + 1; 
+unsigned int lastHost = subnetBroadcast - 1; 
+printf("\nSubnet %d:\n", i + 1); 
+printf("Network Address: "); 
+intToIp(subnetNetwork, buffer); 
+printf("%s\n", buffer); 
+printf("Broadcast Address: "); 
+intToIp(subnetBroadcast, buffer); 
+printf("%s\n", buffer); 
+printf("Subnet Mask: "); 
+intToIp(newSubnetMask, buffer); 
+printf("%s\n", buffer); 
+printf("First Host: "); 
+intToIp(firstHost, buffer); 
+printf("%s\n", buffer); 
+printf("Last Host: "); 
+intToIp(lastHost, buffer); 
+printf("%s\n", buffer); 
+} 
+return 0; 
+}
+
+
+Take an example SUBNET OF HOSTS and obtain a broadcast tree for the subnet IN JAVA :
+
+import java.util.Scanner;
+
+public class SubnetBroadcastTree {
+
+    // Convert IP string to 32-bit integer
+    public static long ipToInt(String ip) {
+        String[] parts = ip.split("\\.");
+        long a = Long.parseLong(parts[0]);
+        long b = Long.parseLong(parts[1]);
+        long c = Long.parseLong(parts[2]);
+        long d = Long.parseLong(parts[3]);
+        return (a << 24) | (b << 16) | (c << 8) | d;
+    }
+
+    // Convert 32-bit integer to IP string
+    public static String intToIp(long ip) {
+        return ((ip >> 24) & 0xFF) + "." +
+               ((ip >> 16) & 0xFF) + "." +
+               ((ip >> 8) & 0xFF) + "." +
+               (ip & 0xFF);
+    }
+
+    // Calculate subnet mask from prefix length
+    public static long calculateSubnetMask(int prefixLength) {
+        if (prefixLength == 0) return 0;
+        return ~((1L << (32 - prefixLength)) - 1) & 0xFFFFFFFFL;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter IP address (e.g., 192.168.1.0): ");
+        String ip = sc.nextLine();
+
+        System.out.print("Enter current prefix length (e.g., 24): ");
+        int prefixLength = sc.nextInt();
+
+        int newPrefixLength = prefixLength + 1;
+
+        long ipInt = ipToInt(ip);
+
+        long subnetMask = calculateSubnetMask(prefixLength);
+        long newSubnetMask = calculateSubnetMask(newPrefixLength);
+
+        int hostsPerSubnet = (int) ((1L << (32 - newPrefixLength)) - 2);
+
+        System.out.println("\nNumber of subnets: 2");
+        System.out.println("Number of hosts per subnet: " + hostsPerSubnet);
+
+        // Generate 2 subnets
+        for (int i = 0; i < 2; i++) {
+
+            long subnetNetwork =
+                    (ipInt & subnetMask) | ((long)i << (32 - newPrefixLength));
+
+            long subnetBroadcast = subnetNetwork | (~newSubnetMask & 0xFFFFFFFFL);
+
+            long firstHost = subnetNetwork + 1;
+            long lastHost = subnetBroadcast - 1;
+
+            System.out.println("\nSubnet " + (i + 1) + ":");
+            System.out.println("Network Address: " + intToIp(subnetNetwork));
+            System.out.println("Broadcast Address: " + intToIp(subnetBroadcast));
+            System.out.println("Subnet Mask: " + intToIp(newSubnetMask));
+            System.out.println("First Host: " + intToIp(firstHost));
+            System.out.println("Last Host: " + intToIp(lastHost));
+        }
+
+        sc.close();
+    }
+}
