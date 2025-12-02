@@ -1,0 +1,82 @@
+Software Requirements Specification (SRS)
+
+Project: Smart Campus Carpooling System
+
+1. Introduction
+
+1.1 Purpose
+
+This SRS describes the functional and non-functional requirements of the
+Smart Campus Carpooling System, enabling students, staff, and residents
+to share rides efficiently.
+
+1.2 Scope
+
+The system provides user registration, ride posting, ride searching,
+booking, profile management, and an admin dashboard.
+
+2. Overall Description
+
+2.1 Product Perspective
+
+The system is a web-based platform integrating login, ride management,
+and real-time carpool matching.
+
+2.2 Product Functions
+
+-   Register and log in
+-   Create and view carpool rides
+-   Search for available rides
+-   Book or cancel rides
+-   View user profile
+-   Admin verification of users
+
+2.3 User Classes
+
+-   Riders
+-   Drivers
+-   Administrator
+
+3. System Features
+
+3.1 User Registration & Login
+
+-   Users sign up with email and password.
+-   Passwords stored securely.
+
+3.2 Ride Posting
+
+-   Drivers can post rides with origin, destination, time, and seats
+    available.
+
+3.3 Ride Search
+
+-   Riders can search rides based on destination, date, and time.
+
+3.4 Ride Booking
+
+-   Riders book seats; availability decreases automatically.
+
+4. Non‑Functional Requirements
+
+4.1 Performance
+
+-   System supports up to 500 concurrent users.
+
+4.2 Security
+
+-   Password encryption
+-   Session-based authentication
+
+4.3 Usability
+
+-   Responsive UI for mobile and laptop
+
+5. System Constraints
+
+-   Internet connectivity required
+-   Works on modern web browsers
+
+6. Assumptions & Dependencies
+
+-   Users enter accurate information.
