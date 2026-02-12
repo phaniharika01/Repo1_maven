@@ -1,0 +1,665 @@
+src\components\BookCard.js
+src\components\Navbar.js
+src\context\LibraryContext.js
+src\pages\Home.js
+src\pages\Library.js
+src\App.js
+
+
+
+App.js
+
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Library from "./pages/Library";
+
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/library" element={<Library />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+---------------------------------------
+LibraryContext.js
+
+import React, { createContext, useState } from "react";
+
+export const LibraryContext = createContext();
+
+export const LibraryProvider = ({ children }) => {
+  const [books, setBooks] = useState([
+    { id: 1, title: "Atomic Habits", author: "James Clear", read: false },
+    { id: 2, title: "The Alchemist", author: "Paulo Coelho", read: false },
+    { id: 3, title: "Rich Dad Poor Dad", author: "Robert Kiyosaki", read: false },
+  ]);
+
+  const toggleReadStatus = (id) => {
+    setBooks((prevBooks) =>
+      prevBooks.map((book) =>
+        book.id === id ? { ...book, read: !book.read } : book
+      )
+    );
+  };
+
+  return (
+    <LibraryContext.Provider value={{ books, toggleReadStatus }}>
+      {children}
+    </LibraryContext.Provider>
+  );
+};
+---------------------------------------
+
+Library.js
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { LibraryContext } from "../context/LibraryContext";
+import BookCard from "../components/BookCard";
+
+const Library = () => {
+  const { books, toggleReadStatus } = useContext(LibraryContext);
+  const [search, setSearch] = useState("");
+  const searchInputRef = useRef(null);
+
+  // ✅ Focus input when page loads
+  useEffect(() => {
+    searchInputRef.current.focus();
+  }, []);
+
+  // ✅ Alert when books change
+  useEffect(() => {
+    alert("Library Updated!");
+  }, [books]);
+
+  const filteredBooks = books.filter((book) =>
+    book.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>📖 Library</h2>
+
+      <input
+        type="text"
+        placeholder="Search Books..."
+        ref={searchInputRef}
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{ marginBottom: "20px", padding: "5px" }}
+      />
+
+      {filteredBooks.map((book) => (
+        <BookCard
+          key={book.id}
+          book={book}
+          toggleReadStatus={toggleReadStatus}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default Library;
+
+--------------------------------------
+
+Home.js
+
+
+import React from "react";
+
+const Home = () => {
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>📚 Welcome to Interactive Library Manager</h1>
+      <p>Navigate to Library to manage your books.</p>
+    </div>
+  );
+};
+
+export default Home;
+-----------------------------------
+BookCard.js
+
+import React from "react";
+
+const BookCard = ({ book, toggleReadStatus }) => {
+  return (
+    <div style={{
+      border: "1px solid gray",
+      padding: "10px",
+      marginBottom: "10px",
+      borderRadius: "5px"
+    }}>
+      <h3>{book.title}</h3>
+      <p>Author: {book.author}</p>
+      <p>Status: {book.read ? "✅ Read" : "❌ Unread"}</p>
+
+      <button onClick={() => toggleReadStatus(book.id)}>
+        Toggle Status
+      </button>
+    </div>
+  );
+};
+
+export default BookCard;
+
+----------------------------------------
+Navbar.js
+
+
+import React from "react";
+import { Link } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <nav style={{ padding: "10px", background: "#eee" }}>
+      <Link to="/" style={{ marginRight: "20px" }}>Home</Link>
+      <Link to="/library">Library</Link>
+    </nav>
+  );
+};
+
+export default Navbar;
+---------------------------------------------------
+src\componenets\Navbar.js
+src\context\CourseContext.js
+src\pages\Courses.js
+src\pages\MyCourses.js
+src\App.js
+src\data\courses.js
+
+App.js
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Courses from "./pages/Courses";
+import MyCourses from "./pages/MyCourses";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Courses />} />
+        <Route path="/mycourses" element={<MyCourses />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+-------------------------------------
+
+CourseContext.js
+import { createContext, useState } from "react";
+
+export const CourseContext = createContext();
+
+export const CourseProvider = ({ children }) => {
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+
+  const enrollCourse = (course) => {
+    setEnrolledCourses([...enrolledCourses, course]);
+  };
+
+  return (
+    <CourseContext.Provider value={{ enrolledCourses, enrollCourse }}>
+      {children}
+    </CourseContext.Provider>
+  );
+};
+
+-------------------------------------------
+Courses.js
+
+import { useContext } from "react";
+import courses from "../data/courses";
+import { CourseContext } from "../context/CourseContext";
+
+const Courses = () => {
+  const { enrolledCourses, enrollCourse } = useContext(CourseContext);
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Available Courses</h2>
+
+      {courses.map((course) => {
+        const isEnrolled = enrolledCourses.find(c => c.id === course.id);
+
+        return (
+          <div key={course.id} style={{ marginBottom: "15px" }}>
+            <h4>{course.title}</h4>
+
+            <button
+              onClick={() => enrollCourse(course)}
+              disabled={isEnrolled}
+            >
+              {isEnrolled ? "Enrolled" : "Enroll"}
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default Courses;
+
+------------------------------------------
+MyCourses.js
+import { useContext } from "react";
+import { CourseContext } from "../context/CourseContext";
+
+const MyCourses = () => {
+  const { enrolledCourses } = useContext(CourseContext);
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>My Courses</h2>
+
+      {enrolledCourses.length === 0 ? (
+        <p>No courses enrolled yet.</p>
+      ) : (
+        enrolledCourses.map(course => (
+          <div key={course.id}>
+            <h4>{course.title}</h4>
+          </div>
+        ))
+      )}
+    </div>
+  );
+};
+
+export default MyCourses;
+----------------------------------------
+Navbar.js
+
+import { Link } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <nav style={{ padding: "10px", borderBottom: "1px solid gray" }}>
+      <Link to="/" style={{ marginRight: "15px" }}>Courses</Link>
+      <Link to="/mycourses">My Courses</Link>
+    </nav>
+  );
+};
+
+export default Navbar;
+-----------------------------------------
+
+courses.js
+
+const courses = [
+  { id: 1, title: "React Basics" },
+  { id: 2, title: "Node.js Fundamentals" },
+  { id: 3, title: "MongoDB Essentials" },
+  { id: 4, title: "AWS for Beginners" },
+  { id: 5, title: "Docker Crash Course" },
+];
+
+export default courses;
+----------------------------------------------------
+
+College-portal:
+src/context:
+StudentContext.js:
+
+import React, { createContext, useState } from "react";
+
+export const StudentContext = createContext();
+
+export const StudentProvider = ({ children }) => {
+  const [student, setStudent] = useState({
+    name: "",
+    rollNo: ""
+  });
+
+  return (
+    <StudentContext.Provider value={{ student, setStudent }}>
+      {children}
+    </StudentContext.Provider>
+  );
+};
+
+src/components:
+LandingPage.js:
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { StudentContext } from "../context/StudentContext";
+
+function LandingPage() {
+  const { student, setStudent } = useContext(StudentContext);
+
+  return (
+    <div>
+      <h1>College Event Portal</h1>
+
+      <input
+        type="text"
+        placeholder="Name"
+        value={student.name}
+        onChange={(e) =>
+          setStudent({ ...student, name: e.target.value })
+        }
+      />
+
+      <input
+        type="text"
+        placeholder="Roll No"
+        value={student.rollNo}
+        onChange={(e) =>
+          setStudent({ ...student, rollNo: e.target.value })
+        }
+      />
+
+      <br /><br />
+
+      <Link to="/register">Go to Registration</Link>
+    </div>
+  );
+}
+
+export default LandingPage;
+
+
+RegistrationPage.js:
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { StudentContext } from "../context/StudentContext";
+
+function RegistrationPage() {
+  const { student } = useContext(StudentContext);
+
+  const [workshop, setWorkshop] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const formRef = useRef();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSuccess(true);
+  };
+  
+
+
+  // success message disappear after 3 sec
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  const handleReset = () => {
+    setWorkshop("");
+    formRef.current.reset();
+  };
+
+  return (
+    <div>
+      <h2>Workshop Registration</h2>
+
+      <p>Name: {student.name}</p>
+      <p>Roll No: {student.rollNo}</p>
+
+      <form ref={formRef} onSubmit={handleSubmit}>
+
+        <select
+          value={workshop}
+          onChange={(e) => setWorkshop(e.target.value)}
+        >
+          <option value="">Select Workshop</option>
+          <option value="AI">AI Workshop</option>
+          <option value="Web">Web Development</option>
+          <option value="Cloud">Cloud Computing</option>
+        </select>
+
+        <br /><br />
+
+        <button type="submit">Register</button>
+        <button type="button" onClick={handleReset}>
+          Reset
+        </button>
+
+      </form>
+
+      {success && <p>Registration Successful</p>}
+    </div>
+  );
+}
+
+export default RegistrationPage;
+
+
+App.js:
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LandingPage from "./components/LandingPage";
+import RegistrationPage from "./components/RegistrationPage";
+import { StudentProvider } from "./context/StudentContext";
+
+function App() {
+  return (
+    <StudentProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={<RegistrationPage />} />
+        </Routes>
+      </BrowserRouter>
+    </StudentProvider>
+  );
+}
+
+export default App;
+
+index.js:
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+
+
+
+SMART-CART:
+
+src/context:
+
+CartContext:
+import React, { createContext, useState } from "react";
+
+export const CartContext = createContext();
+
+export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState([]);
+
+  const addToCart = (product) => {
+    setCartItems((prev) => {
+      const exists = prev.find(p => p.id === product.id);
+      if (exists) {
+        return prev.map(p =>
+          p.id === product.id ? { ...p, qty: p.qty + 1 } : p
+        );
+      }
+      return [...prev, { ...product, qty: 1 }];
+    });
+  };
+
+  return (
+    <CartContext.Provider value={{ cartItems, setCartItems, addToCart }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+
+
+src/components:
+Cart.js:
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { CartContext } from "../context/CartContext";
+
+function Cart() {
+  const { cartItems, setCartItems } = useContext(CartContext);
+  const [total, setTotal] = useState(0);
+  const prevTotal = useRef(0);
+
+  const updateQty = (id, change) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === id
+          ? { ...item, qty: Math.max(1, item.qty + change) }
+          : item
+      )
+    );
+  };
+
+  useEffect(() => {
+    const newTotal = cartItems.reduce(
+      (sum, item) => sum + item.price * item.qty,
+      0
+    );
+
+    prevTotal.current = total;
+    setTotal(newTotal);
+  }, [cartItems]);
+
+  return (
+    <div>
+      <h2>Cart</h2>
+
+      {cartItems.map(item => (
+        <div key={item.id}>
+          {item.name} - ₹{item.price}
+          <button onClick={() => updateQty(item.id, -1)}>-</button>
+          {item.qty}
+          <button onClick={() => updateQty(item.id, 1)}>+</button>
+        </div>
+      ))}
+
+      <h3>Total: ₹{total}</h3>
+
+      {total > prevTotal.current && <p>Total Increased 📈</p>}
+      {total < prevTotal.current && <p>Total Decreased 📉</p>}
+    </div>
+  );
+}
+
+export default Cart;
+
+ProductList.js:
+import React, { useContext } from "react";
+import { CartContext } from "../context/CartContext";
+
+const products = [
+  { id: 1, name: "Laptop", price: 50000 },
+  { id: 2, name: "Phone", price: 20000 },
+  { id: 3, name: "Headphones", price: 3000 }
+];
+
+function ProductList() {
+  const { addToCart } = useContext(CartContext);
+
+  return (
+    <div>
+      <h2>Products</h2>
+      {products.map(p => (
+        <div key={p.id}>
+          {p.name} - ₹{p.price}
+          <button onClick={() => addToCart(p)}>Add</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default ProductList;
+
+
+Navbar.js:
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
+
+function Navbar() {
+  const { cartItems } = useContext(CartContext);
+
+  const totalCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
+
+  return (
+    <nav>
+      <Link to="/">Products</Link> | 
+      <Link to="/cart">Cart ({totalCount})</Link>
+    </nav>
+  );
+}
+
+export default Navbar;
+
+App.js:
+/*
+import logo from './logo.svg';
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+*/
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import ProductList from "./components/ProductList";
+import Cart from "./components/Cart";
+import { CartProvider } from "./context/CartContext";
+
+function App() {
+  return (
+    <CartProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<ProductList />} />
+          <Route path="/cart" element={<Cart />} />
+        </Routes>
+      </BrowserRouter>
+    </CartProvider>
+  );
+}
+
+export default App;
+
+
+
+
