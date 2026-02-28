@@ -1,0 +1,536 @@
+
+WEEK-1
+EC2 INSTANCE CREATION AND CONNECTION
+
+Amazon EC2 Dashboard
+EC2 Instances page that no instances are currently running in the selected region
+Ubuntu instance connection by browser method
+Launch Instance page where the instance name to identify the instance (ex:Linux-ec2)
+
+AMI is Region specific, AMI ID changes with the region
+Select the Instance type, By default t3.micro chosen as a free-tier eligible instance
+Key pair creation used to generate an RSA key pair for secure SSH access. Key can be .pem. It gets downloaded automatically
+
+Network settings configuration showing VPC, subnet, and security group rules (Linux allow ssh, windows allow rdp for connection)
+Launch the instance by clicking on launch Instance. Now AWS creates the ec2 with the specified configuration and region
+
+Now the instance is successfully created. Now we can connect to the ec2 instance
+
+EC2 Connection Methods
+
+EC2 connect method (Browser based method)
+
+Linux Instance
+
+Successfully connected to ec2 instance by browser based method
+
+Ubuntu connection with ppk file using PuTTY software
+Before starting the process we need to download the PuTTY software
+Go to official site to download the software and download exe file
+Create the Ubuntu instance. Provide the name of the instance
+
+Create a key pair by selecting the key file format as ppk
+
+Allow SSH traffic
+
+Click on launch instance the instance will get created successfully
+
+Select the Ubuntu instance and connect to copy the ip address
+
+Now open the PuTTY to connect to EC2 instance
+Paste the copied ip address in host name
+
+Select the ppk which is generated in the above step and click on open to establish connection
+Type ubuntu at the login as because we chosen linux AMI
+
+We have successfully connected to EC2 instance
+
+Ubuntu instance with pem file using puttygen software
+Download the puttygen software from the browser
+Create a Ubuntu instance with pem file
+
+Open the puttygen. To connect using PuTTY we need ppk, to convert the pem to ppk we need PuTTYgen.
+Load the pem file to PuTTYgen from the local machine
+Click on save private key to get ppk file from the pem file. Save the ppk file on local machine
+
+Now open the PuTTY to connect to EC2 instance.
+Copy the public Ip address of the instance to connect.
+Paste the copied ip address in host name
+
+Select the ppk which is generated in the above step and click on open to establish connection
+Type ubuntu at the login as because we chosen linux AMI
+
+We have successfully connected to EC2 instance.
+
+Ubuntu with cloud shell
+Create the Ubuntu instance
+Provide the name to the instance and select Ubuntu as operating system
+
+Create a key value pair or use the existing one, select the key file format as pem
+
+Allow the ssh traffic and click on launch the instance.
+
+Search for the cloud shell in aws console or beside the search icon
+Upload the downloaded .pem to the cloud shell to connect using actions button
+
+Verify the uploaded key using the command (ex: ls)
+
+Now connect the ec2 instance using the command (ssh -i "key-ec2.pem" <username>@<public-ip-or-dns>)
+If any pop ups paste the command (chmod 400 “ubuntucloud1.pem”) to change the permissions
+
+Windows instance
+Lets configure the instance
+Provide a name for the instance
+Select the windows operating system
+
+Create a key pair or use already existing key pair by selecting the key file format as pem
+
+Configure the network setting like vpc, subnet and enable RDP port to connect the instance
+Click on the launch instance button
+
+Now select the windows instance and click on the connect button and select RDP client
+Click on download remote desktop file to install the remote desktop
+Now click on get password
+
+Upload the private key file
+Click on decrypt password
+
+Open the remote desktop connection on local machine
+Copy the password generated from the key pair
+Click on “ok”
+
+Successfully connected to the windows instance
+
+Docker Image pushing into docker hub
+Build Docker Image and push to docker hub from the cloud shell
+Login to root user (using sudo su command)
+Check for docker and git version
+
+Update the system using the following command (sudo apt-get update)
+And install the docker using command (sudo apt-get install docker.io)
+
+Update the system using the following command (sudo apt-get update)
+Copy the repository link to clone the project
+
+Clone the project using git clone command
+Redirect to the cloned directory
+
+Build the docker image using the docker file in the project (using sudo docker build -t image .)
+
+Check whether the image got created by using docker images command
+And run the docker image
+
+Login to docker hub (using docker login command)
+Authenticate using the code provided on the display.
+After login, Tag the docker image using command (sudo docker tag myapp gayathri062/myapp:latest)
+Push the docker image into docker hub using command (sudo docker push gayathri062/myapp)
+
+Verify the Docker hub after pushing the image.
+
+
+
+
+
+
+WEEK – 2
+Create and attach an EBS volume to an EC2 instance.
+
+Create an ec2 instance by selecting t2 nano as insatnce type .
+Scale the instance by increasing CPU and RAM by changing the instance type
+After creating the ec2 instance stop the instance and change the instance type.
+Click "Actions" and then—instance settings—change the instance type "Modify Volume".
+
+Increase/ decrease the size or change the volume type to a higher performance specification.
+Click " change instance type " to apply the changes.
+Now the start the instance you see with increase /decrease of size and performance.
+
+Creating and attaching an EBS volume to an EC2 instance
+Create a New EBS Volume
+Open the EC2 Dashboard.
+From the left-hand menu, select Volumes under Elastic Block Store (EBS).
+Volume type (gp3/gp2), Size of the volume , Availability Zone (must be the same as the EC2 instance)
+Click Create Volume.
+
+Attach the EBS Volume to the Existing EC2 Instance
+Select the newly created volume.
+Click Actions → Attach Volume.
+Select the target EC2 instance from the list.
+Specify the device name.
+Click Attach.
+Verify the Volume on the EC2 Instance
+Connect to the EC2 instance using SSH.
+
+Attached EBS volume and use it to create and attach a new volume to an EC2 instance in same AWS region.
+Copy the ssh key of the instance A
+Open the powershell navigate to the pem file directory , paste the ssh key
+
+Check all available disks : lsblk
+Check filesystem : lsblk -fs
+
+Create a partition on the new volume : sudo fdisk /dev/nvme1n1
+Press m → Help menu
+Press n → New partition
+Press w → Write changes and exit.
+Notify kernel : partprob
+Verify the New Partition : lsblk -fs
+
+Format with XFS filesystem : sudo mkfs.xfs /dev/nvme1n1p1
+Verify : lsblk –fs
+Create a Mount Directory : sudo mkdir /mnt/ebstry
+Mount the Volume : sudo mount /dev/nvme1n1p1 /mnt/ebstry
+Verify : df –h
+Make the Mount Persistent
+Get the UUID of the volume : sudo blkid /dev/nvme1n1p1
+Copy UUID.
+
+Edit fstab: sudo nano /etc/fstab
+Add UUID line at the end of the file.
+UUID= d1f88f9b-c2b7-4973-b9cc-f2f4e377d62e /mnt/ebstry xfs defaults,nofail 0 0
+Save and exit.
+Test fstab: sudo systemctl daemon-reload
+Sudo mount -a
+Verify : df -h
+
+Unmount volume from Instance-A : sudo umount /mnt/data
+Check : df –h
+Verify Persistence :
+Reboot the instance : select the instance and click on reboot instance
+
+Create the new instance B in the same AWS region
+
+Detach Volume:
+Select the volume and deattach with the instance A. Attach the volume to the instance B.
+
+After attaching the volume to the new instance
+Copy the ssh key of instance B and paste it in powershell
+
+Create mount directory : sudo mkdir /mnt/ebstry
+Mount the volume : sudo mount /dev/nvme1n1p1 /mnt/ebstry
+All previous data will be available.
+
+List the blocks to verify : lsblk
+
+Create a snapshot of the attached EBS volume and use it to create and attach a new volume to an EC2 instance in another AWS region.
+Deattach the volume to the instance in N.Virginia
+
+Create a snapshot to the volume which is in N.Virginia .
+Select the snapshot and click on Actions to select copy snapshot.
+Copy the snapshot to another region ( Oregon ) .
+
+Switch to the Destination Region.
+Create a Volume from the Snapshot.
+Create a new ec2 instance in the destination region & attach the Volume to the Instance.
+
+After creating the instance attach the volume to the instance .
+
+Select the instance and copy the ssh key.
+Paste the ssh key in the powershell where the pem file exists.
+
+Verify the Attached Disk : lsblk
+Create a Mount Directory : sudo mkdir /mnt/ebstry
+Mount the Volume : sudo mount /dev/nvme1n1p1 /mnt/ebstry
+Verify : df -h
+
+
+
+
+
+WEEK – 3
+ELASTIC FILE SHARING
+
+Step -1 : Create an instance -> provide the instance name ( efslab-1 )
+Step -2 : Select Amazon Linux as AMI
+Step -3 : Create a key-pair for the instance
+Step -4 : Select the availability zone as us-east-1a .
+Step -5 : Create a security group -> provide the security group name as efslab.
+Step -6 : Edit the network security -> click on add security group rule -> select NFS type and resource -> type is Anywhere
+
+Step -7 : Create another instance ( efslab -2 ) -> Select Amazon Linux as AMI
+Step -8 : In network settings -> select the availability zone as us-east-1b -> select the existing security group ( efslab ),which is created in instance1.
+
+Step -9 : Type EFS in Search bar
+Step -10 : Click on create file system -> provide the name -> click on create file system.
+
+Step -11 : Select the file system and click on view details
+Step -12 : Go to network section -> click on manage
+
+Step -13 : Remove the default security groups -> select the existing security group ( efslab ) in all availability zones -> save the changes.
+
+Step -14 : Select the first instance ( efslab-1 ) -> click on connect
+Step -15 : Go to EC2 instance connect -> connect to browser
+
+Step -16 : Select the second instance (efslab-2 ) -> click on connect -> copy the ssh key
+Step -17 : Open powershell -> paste the shh key of instance -2
+
+Step -18 : In browser -> Type the following commands -> sudo su -> mkdir efslab -> yum install –y amazon-efs-utils
+Step -19 : Type the same commands in power shell of instance-2 .
+
+Step -20 : Go to EFS -> click on Attach .
+Step -21 : Copy the NFS client command.
+
+Step -22 : Paste the copied NFS client command [ NOTE : change the end of NFS client command to directory name ]
+Step -23 : Move into the directory -> cd efslab
+Step -24 : Create a file in that directory -> touch file.txt
+
+Step -25 : Edit the file.
+
+Step -26 : In power shell of Instance – 2 -> paste the NFS client [ NOTE : change the end of NFS client command to directory name ] -> move into the directory -> cd fslab -> List all the files -> ls ( file will be appeared which is created in instance-1 ) -> To display the file content -> cat file.txt.
+
+
+
+
+
+
+
+WEEK 4-S3:
+
+Step -1 : In aws console search for S3
+ 
+Step -2 : Click on create bucket
+ 
+Step -3 : Provide the bucket name , keep the bucket type as default.
+ 
+Step -4 : Leave the Object ownership – ACLs as disabled
+ 
+Step -5 : To give public access to the data remain the block all public access as unchecked
+ 
+Step -6 : Leave every thing as default and click on create bucket. 
+Step -7 : click on the bucket name
+
+Step -8 :  To add the data click on upload button.
+ 
+Step -9 : Click on add files
+ 
+Step -10 : Select any data from the pc and click on upload
+ 
+Step -11 :  Click on image object -> copy the object url.
+ 
+Step -12 : Open browser paste the url - > The image will not be displayed (There is public access for image)
+ 
+Step -13 : click on bucket name -> go to permissions
+ 
+Step -14 : click on edit of block public access 
+ 
+Step -15 : Uncheck the block public access -> click on save changes
+ 
+Step -16 : Go to object ownership -> click on edit
+ 
+Step -17 : select ACLs enabled -> click on save changes
+ 
+Step -18 : click edit button of Access control list
+ 
+Step -19 : select object list and bucket read of public access 
+ 
+Step -20 : click on image -> go to object level permissions
+ 
+Step -21 : click on edit button of access control list
+ 
+Step -22 : select read and list of public access
+ 
+Step -23 : Now copy the object url
+ 
+Step -24 : paste it on browser the image will be displayed
+ 
+
+
+
+
+
+IMAGE VERSIONING:
+
+Step -1 : Go to image -> click on upload
+ 
+Step -2 : Add the same file which is already present -> click on upload
+ 
+Step -3 : Image versions is not showing
+ 
+Step -4 : Go to properties -> click on edit option of bucket versioning
+ 
+Step -5 : enable the bucket versioning -> click on save changes
+ 
+Step -6 : toggle the show version to see the images
+
+Step -7 : Select the image -> click on delete
+  
+Step -8 : But still images will be present when we toggle the show versions along with the delete marker
+ 
+Step -9 : Select all the images and click on delete , it will permanently delete the images
+ 
+ 
+
+
+
+
+
+
+
+OBJECT REPLICATION:
+
+Step -1 :create a bucket in N.Virginia
+ 
+Step -2 : Create another bucket in Oregon-> enable the ACLs 
+
+Step -3 : Uncheck the bucket public access -> create the buket
+ 
+Step -4 : Click on bucket In Oregon region -> Go to management
+ 
+Step -5 : Click on create replication rules
+ 
+Step -6 : Provide the name to the rule
+ 
+Step -7 : select Apply to all objects in the bucket
+ 
+Step -8 : select choose a bucket in this account -> select the destination bucket in another region
+ 
+Step -9 : Choose the IAM role as LabRole
+ 
+Step -10 : Everything go by default -> click on save.
+ 
+Step -11 : Upload any document in Oregon bucket 
+
+Step -12 : Same document will be automatically comes in destination bucket
+ 
+
+
+
+
+
+
+
+STATIC WEB HOSTING:
+
+Create a index.html and write code
+ 
+Create another html file called error.html which has an error message
+
+Go to aws console -> Go to Services → S3 -> click on create bucket -> Bucket name : my-static-web-hosting123
+ 
+Under Block Public Access -> Uncheck Block all public access -> Acknowledge the warning 
+Click on Create bucket
+ 
+Open the bucket-> go to objects tab -> click on upload 
+ 
+Click on add files -> select index.html and error.html files -> click on uplaod
+ 
+Click on bucket -> Go to Properties tab -> scroll to static website -> click on edit
+Enter  : index document  : index.html  , error document :error.html
+Click on save changes
+
+Click on bucket -> go to permissions  -> click edit of object ownership
+ 
+Select ACLs enebled -> click on I acknowledge -> save changes
+ 
+Go to bucket level permissions ->  click on edit 
+ 
+Select public access of objects and bucket ACL -> save the changes
+
+Object-Level Public Access (ACL)
+Go to Objects tab -> click on index.html -> go to permissions
+Scroll to access control list  -> click on edit
+ 
+Under Public access: Everyone (public access) →  Read -> Save changes
+ 
+Repeat the same steps for error.html
+
+Go to bucket level Properties -> scroll to static website hosting -> copy the bucket website endpoint  
+Copy the url into browser
+
+Test Error Page
+Open an invalid URL:
+error.html page is displayed
+
+
+
+
+
+Week 5: 
+VPC Creation and Ec2 Instance Connection
+
+Go to AWS Management Console → VPC
+
+Click Create VPC -> name : my-vpc
+IPv4 CIDR block: e.g. 10.0.0.0/16 -> Click Create VPC
+
+Create subnets in same Availability Zones.
+Select vpc -> provide the name as public-subnet
+Choose AZ -> Enter CIDR ( 10.0.1.0/24 ) -> Create subnet
+
+Select vpc -> provide the name as private-subnet
+Choose AZ -> Enter CIDR ( 10.0.2.0/24 ) -> Create subnet
+
+Go to Internet Gateways -> Click Create internet gateway -> Name : internet gateway
+-> Attach it to your VPC
+
+Go to Route Tables → Create route table
+Select VPC -> name : public route
+
+Create route table for private subnet -> Select VPC -> name : private-route
+
+Select public route -> click on actions -> go to edit routes
+Click on add route -> Destination: 0.0.0.0/0 -> Target: Internet Gateway
+Select the gateway which was created -> save changes
+
+Go to subnets -> Select Public Subnet -> Go to Edit subnet settings -> Enable Auto-assign public IPv4 address
+
+Select public route -> click on edit subnet associations
+Select public subnet -> save associations
+
+Similarly do for private subnet
+
+Create a Security Group -> Add inbound rules:
+o HTTP (80) / HTTPS (443)
+o SSH (22)
+
+Go to EC2
+
+Create a instance -> select Ubuntu as AMI
+Edit the network settings -> select vpc -> select public subnet -> enable public ip -> launch the instance
+
+Create another instance -> select Ubuntu as AMI
+Edit the network settings -> select vpc -> select private subnet -> disable the public ip -> launch instance
+
+Select public instance -> click on connect
+
+Select private instance -> click on connect
+Private instance will not be connected
+ 
+
+
+
+WEEK – 6
+VPC USING NAT GATEWAY
+
+Create a vpc (my-vpc) -> create a public and private subnets -> create 2 route tables for public and private subnet -> create a internet gateway.
+Connects the subnets to the respective route tables -> connect public route table to the internet gateway.
+
+Create a instance (web-app ) -> select AMI as ubuntu
+Edit the network settings -> select the vpc (my-vpc) -> select public subnet -> provide the security grp name
+Select inbound security rules as ssh - anywhere -> http-anywhere -> https - anywhere
+Check where there is internet is coming for web-app instance
+
+Create another instance (db-server) -> select AMI as ubuntu
+Edit the network setting -> select my-vpc -> select for private-subnet -> disable public ip
+Select the inbound rules -> select type as ssh-anywhere -> keep everything as default -> click on launch instance
+instance in private subnet cannot be able connect to the internet
+
+create another instance (jump-server) -> select AMI as ubuntu
+Edit the network settings-> select vpc -> select public –subnet -> create a security grp
+Select ssh as my ip-> keep everything as default -> launch the instance
+Connect the instance using ssh client
+Check whether the instance is getting internet access by typing ping google.com or sudo apt-get update
+Paste the private instance ssh key it throws an error due to absence of pem file private instance
+Select the private instance -> go to security tab -> click on security id
+Change the ssh source as my ip from custom -> paste the jump-server private ip and mask as 32 -> select mysql/aurora and bastion subnet -> click on save rules
+
+Come out of that instance -> type the scp command to get the private instance pem file
+(scp –i baiston.pem private.pem Ubuntu@(baiston public ip):~)
+
+Connect with the jump-server again
+Paste the ssh key of db-server -> Change the permissions to connect with the private instance
+Paste the private instance ssh client key to with the private instancen -> check whether there is an internet access to that instance by giving ping google.com command
+
+Create a nat gateway to provide the internet to the private instance , nat gaetway will be created In public subnet.
+Provide a name -> select the vpc
+Select the private route table -> go to edit routes
+Click on add route -> destination as 0.0.0.0 -> select nat gateway which is created
+Now the private instance will get internet access through jump-server using nat gateway
